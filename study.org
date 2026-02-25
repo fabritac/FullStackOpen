@@ -1,0 +1,54 @@
+* Parte 0
+** Fundamentos de las aplicaciones web
+
+*** HTTP
+Es un protocolo que sirve para la transmision de documentos hipermedia. Sigue el modelo cliente-servidor, en el que un cliente establece una conexion con el servidor, realiza una peticion y espera hasta recibir una respuesta del mismo.
+Es un *protocolo sin estado*, el servidor no guarda ningun dato (estado) entre dos peticiones.
+
+**** GET
+Es un metodo de HTTP que solicita un recurso. Las solicitudes que usan *GET* solo deben usarse para recuperar datos (no deben incluir datos).
+
+Ejemplo de la secuencia de acciones entre la comunicacion del navegador con el servidor.
+
+| browser | --> | server |
+| HTTP GET https://ejemplo.com |
+
+| browser | <-- | server |
+| HTML-code |
+
+| browser | --> | server |
+| HTTP GET https://ejemplo.com/imagen.png |
+
+| browser | <-- | server |
+| imagen.png |
+
+Notar que la pagina HTML comienza a mostrarse antes de que la imagen se haya obtenido del servidor.
+
+Ejemplo mas complejo.
+
+| browser | --> | server |
+| HTTP GET https://ejemplo.com/notas |
+
+| browser | <-- | server |
+| HTML-code |
+
+| browser | --> | server |
+| HTTP GET https://ejemplo.com/main.css |
+
+| browser | <-- | server |
+| main.css |
+
+| browser | --> | server |
+| HTTP GET https://ejemplo.com/main.js |
+
+| browser | <-- | server |
+| main.js |
+
+| Navegador empieza a ejecutar el codigo-js que pide datos JSON del server |
+| browser | --> | server |
+| HTTP GET https://ejemplo.com/data.json |
+
+| browser | <-- | server |
+| [{content: "HTML is easy", date:"2019-05-23" }, ...] |
+
+El navegador ejecuta un controlador de eventos, que muestra las paginas usando DOM-API.
