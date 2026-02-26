@@ -1,3 +1,5 @@
+# Parte 0
+## Diagrama de secuencia: comunicacion del navegador y el servidor en el tiempo
 ```mermaid
 sequenceDiagram
     participant browser
