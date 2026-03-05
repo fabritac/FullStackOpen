@@ -17,11 +17,9 @@ const App = () => {
 
 
   const handleSelected = () => {
-    const max = anecdotes.length - 1
-    const min = 0
-    let newSelected = Math.floor(Math.random() * (max - min + 1)) + min
-    if (newSelected == selected) {
-      newSelected += 1
+    let newSelected = selected
+    while (newSelected == selected) {
+      newSelected = Math.floor(Math.random() * anecdotes.length) 
     }
     setSelected(newSelected)
   }
