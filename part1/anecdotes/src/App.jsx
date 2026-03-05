@@ -18,7 +18,7 @@ const App = () => {
 
   const handleSelected = () => {
     let newSelected = selected
-    while (newSelected == selected) {
+    while (newSelected === selected) {
       newSelected = Math.floor(Math.random() * anecdotes.length) 
     }
     setSelected(newSelected)
