@@ -13,10 +13,14 @@ const App = () => {
   ]
    
   const [selected, setSelected] = useState(0)
+  const max = anecdotes.length - 1
+  const min = 0
+  console.log(selected)
 
   return (
     <div>
-      {anecdotes[selected]}
+      <div>{anecdotes[selected]}</div>
+      <button onClick={() => setSelected(Math.floor(Math.random() * (max - min + 1)) + min)}>next anecdote</button>
     </div>
   )
 }
