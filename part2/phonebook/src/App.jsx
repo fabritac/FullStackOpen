@@ -2,11 +2,9 @@ import { useState } from 'react'
 
 const Filter = ({value, onChange}) => {
   return (
-    <form>
-      <div>
-        filter: <input value={value} onChange={onChange}/>
-      </div>
-    </form>
+    <div>
+      filter: <input value={value} onChange={onChange}/>
+    </div>
   )
 }
 
@@ -67,10 +65,11 @@ const App = () => {
     } else if(persons.find((element) => element.number === newNumber)) {
       alert(`${newNumber} is already added to phonebook`)
     } else {
+      const id = Math.max(...persons.map(p => p.id)) + 1
       const personObj = {
         name: newName,
         number: newNumber,
-        id: persons.length + 1
+        id: id
       }
       setPersons(persons.concat(personObj))
       setNewName('')
