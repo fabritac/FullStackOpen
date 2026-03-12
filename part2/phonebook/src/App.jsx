@@ -9,13 +9,21 @@ const Filter = ({value, onChange}) => {
   )
 }
 
-const Persons = ({persons}) => {
+const Persons = ({ persons, setPersons }) => {
   return (
-    <div>
-      {persons.map(person => 
-        <p key={person.id}>{person.name} {person.number}</p>
-      )}
-    </div>
+    <ul>
+      {persons.map(person => (
+        <li key={person.id}>
+          {person.name} {person.number}
+          <button onClick={() => { if (window.confirm(`Do you want to remove ${person.name}?`)) {
+            personService.deletePerson(person.id)
+             .then(() => {
+              setPersons(persons.filter(p => p.id !== person.id))
+             })
+          }}}>delete</button>
+        </li>
+      ))}
+    </ul>
   )
 }
 
@@ -68,7 +76,7 @@ const App = () => {
     } else if(persons.find((element) => element.number === newNumber)) {
       alert(`${newNumber} is already added to phonebook`)
     } else {
-      const id = Math.max(...persons.map(p => p.id)) + 1
+      const id = persons.length > 0 ? persons.length + 1 : 1
       const personObj = {
         name: newName,
         number: newNumber,
@@ -104,7 +112,7 @@ const App = () => {
 
       <h2>Numbers</h2>
       
-      <Persons persons={personsToShow} />
+      <Persons persons={personsToShow} setPersons={setPersons} />
     </div>
   )
 }
