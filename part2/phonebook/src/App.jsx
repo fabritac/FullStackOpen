@@ -10,17 +10,21 @@ const Filter = ({value, onChange}) => {
 }
 
 const Persons = ({ persons, setPersons }) => {
+  const handleDelete = (person) => {
+    if (window.confirm(`Do you want to remove ${person.name}`)) {
+      personService.deletePerson(person.id)
+        .then(() => {
+          setPersons(persons.filter(p => p.id !== person.id))
+      })
+    }
+  }
+
   return (
     <ul>
       {persons.map(person => (
         <li key={person.id}>
           {person.name} {person.number}
-          <button onClick={() => { if (window.confirm(`Do you want to remove ${person.name}?`)) {
-            personService.deletePerson(person.id)
-             .then(() => {
-              setPersons(persons.filter(p => p.id !== person.id))
-             })
-          }}}>delete</button>
+          <button onClick={() => handleDelete(person)}>delete</button>
         </li>
       ))}
     </ul>
@@ -45,6 +49,10 @@ const PersonForm = (props) => {
 
 const App = () => {
   const [persons, setPersons] = useState([])
+  const [newName, setNewName] = useState('')
+  const [newNumber, setNewNumber] = useState('')
+  const [newFilter, setNewFilter] = useState('')
+  
   useEffect(() => {
     personService
       .getAll()
@@ -52,10 +60,7 @@ const App = () => {
         setPersons(initialPersons)
       })
   }, [])
-
-  const [newName, setNewName] = useState('')
-  const [newNumber, setNewNumber] = useState('')
-  const [newFilter, setNewFilter] = useState('')
+  
 
   const handleNameChange = (event) => {
     setNewName(event.target.value)
@@ -71,35 +76,43 @@ const App = () => {
 
   const addPerson = (event) => {
     event.preventDefault()
-    const existingPerson = persons.find(element => element.name === newName)
+
+    const existingPerson = persons.find(element => element.name.toLowerCase() === newName.toLowerCase())
+
     if (existingPerson) {
       if (window.confirm(`${existingPerson.name} already has a number, change it?`)) {
         const updatedPerson = { ...existingPerson, number: newNumber }
+
         personService
-          .update(updatedPerson.id, updatedPerson)
+          .update(existingPerson.id, updatedPerson)
           .then(returnedPerson => {
-            setPersons(persons.map(p => p.id !== returnedPerson.id ? p : returnedPerson))
+            setPersons(prev =>
+              prev.map(p => p.id !== returnedPerson.id ? p : returnedPerson)
+            )
             setNewName('')
             setNewNumber('')
           })
       }
-    } else if (persons.find((element) => element.number === newNumber)) {
+      return
+    } 
+    
+    if (persons.find((p) => p.number === newNumber)) {
       alert(`${newNumber} is already added to phonebook`)
-    } else {
-      const id = persons.length > 0 ? persons.length + 1 : 1
-      const personObj = {
-        name: newName,
-        number: newNumber,
-        id: id
-      }
-      personService
-        .create(personObj)
-        .then(returnedPerson => {
-          setPersons(persons.concat(returnedPerson))
-          setNewName('')
-          setNewNumber('')
-        })
+      return
+    } 
+    
+    const personObj = {
+      name: newName,
+      number: newNumber,
     }
+
+    personService
+      .create(personObj)
+      .then(returnedPerson => {
+        setPersons(prev => prev.concat(returnedPerson))
+        setNewName('')
+        setNewNumber('')
+      })  
   }
 
   const personsToShow = persons.filter(person =>
