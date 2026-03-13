@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import personService from './services/persons'
+import {NotificationError, NotificationSuccess } from './components/notification'
 
 const Filter = ({value, onChange}) => {
   return (
@@ -9,13 +10,17 @@ const Filter = ({value, onChange}) => {
   )
 }
 
-const Persons = ({ persons, setPersons }) => {
+const Persons = ({ persons, setPersons, setErrorMessage }) => {
   const handleDelete = (person) => {
     if (window.confirm(`Do you want to remove ${person.name}`)) {
       personService.deletePerson(person.id)
         .then(() => {
           setPersons(persons.filter(p => p.id !== person.id))
-      })
+          setErrorMessage(`${person.name} has been deleted`)
+          setTimeout(() => {
+          setErrorMessage(null)
+          }, 5000)
+        })
     }
   }
 
@@ -52,6 +57,8 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [newFilter, setNewFilter] = useState('')
+  const [errorMessage, setErrorMessage] = useState(null)
+  const [successMessage, setSuccessMessage] = useState(null)
   
   useEffect(() => {
     personService
@@ -112,6 +119,10 @@ const App = () => {
         setPersons(prev => prev.concat(returnedPerson))
         setNewName('')
         setNewNumber('')
+        setSuccessMessage(`${returnedPerson.name} has been added successfully in the phonebook`)
+        setTimeout(() => {
+          setSuccessMessage(null)
+        }, 5000)
       })  
   }
 
@@ -121,6 +132,10 @@ const App = () => {
 
   return (
     <div>
+      
+      <NotificationError message={errorMessage} />
+      <NotificationSuccess message={successMessage} />
+      
       <h2>Phonebook</h2>
       
       <Filter value={newFilter} onChange={handleFilterChange} />
@@ -135,7 +150,7 @@ const App = () => {
 
       <h2>Numbers</h2>
       
-      <Persons persons={personsToShow} setPersons={setPersons} />
+      <Persons persons={personsToShow} setPersons={setPersons} setErrorMessage={setErrorMessage}/>
     </div>
   )
 }
