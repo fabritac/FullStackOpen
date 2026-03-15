@@ -125,7 +125,7 @@ const App = () => {
         setPersons(prev => prev.concat(returnedPerson))
         setNewName('')
         setNewNumber('')
-        setSuccessMessage(`${returnedPerson.name} has been added successfully in the phonebook`)
+        setSuccessMessage(`Added ${returnedPerson.name}`)
         setTimeout(() => {
           setSuccessMessage(null)
         }, 5000)
