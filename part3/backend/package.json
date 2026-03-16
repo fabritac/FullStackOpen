@@ -1,0 +1,14 @@
+{
+  "name": "backend",
+  "version": "0.0.1",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \\\"Error: no test specified\\\" && exit 1"
+  },
+  "author": "fabri",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}
