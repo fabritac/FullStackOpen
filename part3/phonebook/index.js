@@ -1,10 +1,25 @@
 const express = require('express')
 var morgan = require('morgan')
 
+morgan.token('content-post', function functionGetContentPost(request) {
+    const name = request.body.name
+    const number = request.body.number
+    return JSON.stringify({ name: name, number: number })
+})
+
 const app = express()
 
 app.use(express.json())
-app.use(morgan('tiny'))
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms',
+    {
+        skip: (request) => request.method === 'POST'
+    }
+))
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms :content-post',
+    {
+        skip: (request) => request.method !== 'POST'
+    }
+))
 
 let persons = [
     {
@@ -72,7 +87,7 @@ app.post('/api/persons', (request, response) => {
     const body = request.body
 
     if (!body.name || !body.number) {
-        return response.status(404).json({
+        return response.status(400).json({
             error: 'content missing'
         })
     }
