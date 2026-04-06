@@ -31,6 +31,15 @@ app.get('/api/persons', (request, response) => {
     })
 })
 
+app.get('/info', (request, response) => {
+    Person.countDocuments({}).then(count => {
+        const date = new Date()
+        response.send(
+            `<p>Phonebook has info for ${count} people<\p><p>${date}</p>`
+        )
+    })
+})
+
 const unknowEndpoint = (request, response) => {
     response.status(404).send({ error: 'unknow endpoint' })
 }
@@ -90,7 +99,7 @@ app.put('/api/persons/:id', (request, response, next) => {
             person.number = number
 
             return person.save().then((updatedPerson) => {
-                respose.json(updatedPerson)
+                response.json(updatedPerson)
             })
         })
         .catch(error => next(error))
