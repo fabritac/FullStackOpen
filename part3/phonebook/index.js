@@ -25,23 +25,27 @@ app.use(morgan(':method :url :status :res[content-length] - :response-time ms :c
 ))
 app.use(express.static('dist'))
 
-app.get('/', (request, response) => {
-    response.send('Hello, world!')
-})
-
 app.get('/api/persons', (request, response) => {
     Person.find({}).then(person => {
         response.json(person)
     })
 })
 
-app.get('/info', (request, response) => {
-    const phonebookSize = persons.length
-    const currentDate = new Date()
-    response.send(`Phonebook has info for ${phonebookSize} people. <br>Current date: ${currentDate}`);
-})
+const unknowEndpoint = (request, response) => {
+    response.status(404).send({ error: 'unknow endpoint' })
+}
 
-app.get('/api/persons/:id', (request, response) => {
+const errorHandler = (error, request, response, next) => {
+    console.error(error.message)
+
+    if (error.name === 'CastError') {
+        return response.status(400).send({ error: 'malformatted id' })
+    }
+
+    next(error)
+}
+
+app.get('/api/persons/:id', (request, response, next) => {
     Person.findById(request.params.id).then(person => {
         if (person) {
             response.json(person)
@@ -49,14 +53,15 @@ app.get('/api/persons/:id', (request, response) => {
             response.status(404).end()
         }
     })
-    .catch(() => response.status(400).end())
+    .catch(error => next(error))
 })
 
-app.delete('/api/persons/:id', (request, response) => {
-    const id = request.params.id
-    persons = persons.filter(person => person.id !== id)
-
-    response.status(204).end()
+app.delete('/api/persons/:id', (request, response, next) => {
+    Person.findByIdAndDelete(request.params.id)
+        .then(result => {
+            response.status(204).end()
+        })
+        .catch(error => next(error))
 })
 
 app.post('/api/persons', (request, response) => {
@@ -71,6 +76,28 @@ app.post('/api/persons', (request, response) => {
         response.json(savedPerson)
     })
 })
+
+app.put('/api/persons/:id', (request, response, next) => {
+    const { name, number } = request.body
+
+    Person.findById(request.params.id)
+        .then(person => {
+            if (!person) {
+                return response.status(404).end()
+            }
+
+            person.name = name
+            person.number = number
+
+            return person.save().then((updatedPerson) => {
+                respose.json(updatedPerson)
+            })
+        })
+        .catch(error => next(error))
+})
+
+app.use(unknowEndpoint)
+app.use(errorHandler)
 
 const PORT = process.env.PORT
 app.listen(PORT, () => {
