@@ -51,6 +51,12 @@ test.only('a specific blog is within the returned blogs', async () => {
     assert(titles.includes('Go To Statement Considered Harmful'))
 })
 
+test.only('unique identifier property of the blog posts is named id', async () => {
+    const response = await api.get('/api/blogs')
+    const blog = response.body[0]
+    assert.ok(blog.id)
+})
+
 after(async () => {
     await mongoose.connection.close()
 })
