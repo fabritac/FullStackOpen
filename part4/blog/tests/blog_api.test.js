@@ -4,6 +4,7 @@ const mongoose = require('mongoose')
 const supertest = require('supertest')
 const app = require('../app')
 const Blog = require('../models/blog')
+const helper = require('./test_helper')
 
 const api = supertest(app)
 
@@ -146,8 +147,65 @@ describe('PUT /api/blogs/:id', () => {
     })
 })
 
+describe('when the initial users are loaded', () => {
+    beforeEach(async () => {
+        await helper.populateUsers()
+    })
+
+    test('all initial users are loaded', async () => {
+        const response = await api.get('/api/users').expect(200)
+        const usernames = response.body.map(user => user.username)
+
+        assert.strictEqual(response.body.length, helper.initialUsers.length)
+        assert.deepStrictEqual(
+            usernames.sort(),
+            helper.initialUsers.map(user => user.username).sort()
+        )
+    })
+
+    test('creation succeeds with a fresh username', async () => {
+        const usersAtStart = await helper.usersInDb()
+
+        const newUser = {
+            username: 'newuser',
+            name: 'New User',
+            password: 'password123'
+        }
+
+        await api
+            .post('/api/users')
+            .send(newUser)
+            .expect(201)
+            .expect('Content-Type', /application\/json/)
+
+        const usersAtEnd = await helper.usersInDb()
+        assert.strictEqual(usersAtEnd.length, usersAtStart.length + 1)
+
+        const usernames = usersAtEnd.map(u => u.username)
+        assert.ok(usernames.includes(newUser.username))
+    })
+
+    test('creation fails with an existing username', async () => {
+        const usersAtStart = await helper.usersInDb()
+
+        const newUser = {
+            username: helper.initialUsers[0].username,
+            name: 'New User',
+            password: 'password123'
+        }
+
+        await api
+            .post('/api/users')
+            .send(newUser)
+            .expect(400)
+            .expect('Content-Type', /application\/json/)
+
+        const usersAtEnd = await helper.usersInDb()
+        assert.strictEqual(usersAtEnd.length, usersAtStart.length)
+    })
+})
+
 after(async () => {
     await mongoose.connection.close()
 })
-
 
