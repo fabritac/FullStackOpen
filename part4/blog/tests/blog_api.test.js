@@ -111,6 +111,20 @@ describe('POST /api/blogs', () => {
     })
 })
 
+describe('DELETE /api/blogs/:id', () => {
+    test('a blog can be deleted', async () => {
+        const blogsAtStart = await api.get('/api/blogs')
+        const blogToDelete = blogsAtStart.body[0]
+
+        await api
+            .delete(`/api/blogs/${blogToDelete.id}`)
+            .expect(204)
+
+        const blogsAtEnd = await api.get('/api/blogs')
+        assert.strictEqual(blogsAtEnd.body.length, initialBlogs.length - 1)
+    })
+})
+
 after(async () => {
     await mongoose.connection.close()
 })
