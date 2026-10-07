@@ -125,6 +125,27 @@ describe('DELETE /api/blogs/:id', () => {
     })
 })
 
+describe('PUT /api/blogs/:id', () => {
+    test('a blog can be updated', async () => {
+        const blogsAtStart = await api.get('/api/blogs')
+        const blogToUpdate = blogsAtStart.body[0]
+
+        const updatedBlogData = {
+            likes: blogToUpdate.likes + 1
+        }
+
+        await api
+            .put(`/api/blogs/${blogToUpdate.id}`)
+            .send(updatedBlogData)
+            .expect(200)
+            .expect('Content-Type', /application\/json/)
+
+        const blogsAtEnd = await api.get('/api/blogs')
+        const updatedBlog = blogsAtEnd.body.find(b => b.id === blogToUpdate.id)
+        assert.strictEqual(updatedBlog.likes, blogToUpdate.likes + 1)
+    })
+})
+
 after(async () => {
     await mongoose.connection.close()
 })
