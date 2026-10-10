@@ -96,6 +96,29 @@ describe('POST /api/blogs', () => {
         assert.strictEqual(response.body[response.body.length - 1].likes, 0)
     })
 
+    test('a blog is associated with a random user', async () => {
+        await helper.populateUsers()
+        const newBlog = {
+            title: 'Blog With User',
+            url: 'https://blogwithuser.com/'
+        }
+
+        const response = await api
+            .post('/api/blogs')
+            .send(newBlog)
+            .expect(201)
+
+        assert.ok(
+            helper.initialUsers.some(user => user.username === response.body.user.username)
+        )
+
+        const usersResponse = await api.get('/api/users')
+        const associatedUser = usersResponse.body.find(
+            user => user.username === response.body.user.username
+        )
+        assert.ok(associatedUser.blogs.some(blog => blog.id === response.body.id))
+    })
+
     test('blog without title and url is not added', async () => {
         const newBlog = {
             author: 'John Doe',
@@ -208,4 +231,3 @@ describe('when the initial users are loaded', () => {
 after(async () => {
     await mongoose.connection.close()
 })
-
