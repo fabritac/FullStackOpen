@@ -1,23 +1,17 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import Blog from './components/Blog'
 import blogService from './services/blogs'
 import loginService from './services/login'
 import { NotificationError, NotificationSuccess } from './components/Notification'
 import BlogForm from './components/BlogForm'
 import LoginForm from './components/LoginForm'
+import Togglable from './components/Togglable'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
-  const [title, setTitle] = useState('')
-  const [author, setAuthor] = useState('')
-  const [url, setUrl] = useState('')
   const [errorMessage, setErrorMessage] = useState(null)
   const [successMessage, setSuccessMessage] = useState(null)
-  const [loginFormVisible, setLoginFormVisible] = useState(false)
-  const [blogFormVisible, setBlogFormVisible] = useState(false)
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
@@ -34,21 +28,23 @@ const App = () => {
     }
   }, [])
 
-  const handleLogin = async (event) => {
-    event.preventDefault()
-    console.log('loggin in with', username, password)
-
+  const loginUser = async (userObject) => {
     try {
-      const user = await loginService.login({ username, password })
-
-      window.localStorage.setItem('loggedBlogappUser', JSON.stringify(user))
-
-      blogService.setToken(user.token)
-      setUser(user)
-      setUsername('')
-      setPassword('')
+      loginService
+        .login(userObject)
+        .then(user => {
+          window.localStorage.setItem(
+            'loggedBlogappUser', JSON.stringify(user)
+          )
+          blogService.setToken(user.token)
+          setUser(user)
+          setSuccessMessage('login successful')
+          setTimeout(() => {
+            setSuccessMessage(null)
+          }, 5000)
+        })
     } catch (exception) {
-      setErrorMessage('wrong credentials')
+      setErrorMessage('wrong username or password')
       setTimeout(() => {
         setErrorMessage(null)
       }, 5000)
@@ -60,24 +56,15 @@ const App = () => {
     setUser(null)
   }
 
-  const handleBlogCreate = async (event) => {
-    event.preventDefault()
+  const addBlog = async (blogObject) => {
     try {
-      const newBlog = {
-        title,
-        author,
-        url
-      }
-      const createdBlog = await blogService.create(newBlog)
-      setBlogs(blogs.concat(createdBlog))
-      setTitle('')
-      setAuthor('')
-      setUrl('')
-      setSuccessMessage('blog created successfully')
+      const returnedBlog = await blogService.create(blogObject)
+      setBlogs(previousBlogs => previousBlogs.concat(returnedBlog))
+      setSuccessMessage(`a new blog ${blogObject.title} by ${blogObject.author} added`)
       setTimeout(() => {
         setSuccessMessage(null)
       }, 5000)
-    } catch (exception) {
+    } catch {
       setErrorMessage('error creating blog')
       setTimeout(() => {
         setErrorMessage(null)
@@ -86,50 +73,20 @@ const App = () => {
   }
 
   const loginForm = () => {
-    const hideWhenVisible = { display: loginFormVisible ? 'none' : '' }
-    const showWhenVisible = { display: loginFormVisible ? '' : 'none' }
-
     return (
-      <div>
-        <div style={hideWhenVisible}>
-          <button onClick={() => setLoginFormVisible(true)}>login</button>
-        </div>
-        <div style={showWhenVisible}>
+      <Togglable buttonLabel="login">
           <LoginForm
-            handleLogin={handleLogin}
-            username={username}
-            setUsername={setUsername}
-            password={password}
-            setPassword={setPassword}
+            loginUser={loginUser}
           />
-          <button onClick={() => setLoginFormVisible(false)}>cancel</button>
-        </div>
-      </div>
+      </Togglable>
     )
   }
 
   const blogForm = () => {
-    const hideWhenVisible = { display: blogFormVisible ? 'none' : '' }
-    const showWhenVisible = { display: blogFormVisible ? '' : 'none' }
-
     return (
-      <div>
-        <div style={hideWhenVisible}>
-          <button onClick={() => setBlogFormVisible(true)}>create new blog</button>
-        </div>
-        <div style={showWhenVisible}>
-          <BlogForm
-            handleCreateBlog={handleBlogCreate}
-            title={title}
-            setTitle={setTitle}
-            author={author}
-            setAuthor={setAuthor}
-            url={url}
-            setUrl={setUrl}
-          />
-          <button onClick={() => setBlogFormVisible(false)}>cancel</button>
-        </div>
-      </div>
+      <Togglable buttonLabel="create new blog">
+        <BlogForm createBlog={addBlog} />
+      </Togglable>
     )
   }
 
