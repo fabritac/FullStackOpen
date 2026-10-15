@@ -92,6 +92,28 @@ const App = () => {
     }
   }
 
+  const removeBlog = async (blogObject) => {
+    try {
+      await blogService.remove(blogObject.id)
+      setBlogs(previousBlogs => previousBlogs.filter(blog => blog.id !== blogObject.id))
+      setSuccessMessage(`blog ${blogObject.title} by ${blogObject.author} removed`)
+      setTimeout(() => {
+        setSuccessMessage(null)
+      }, 5000)
+    } catch {
+      setErrorMessage('error removing blog')
+      setTimeout(() => {
+        setErrorMessage(null)
+      }, 5000)
+    }
+  }
+
+  const handleRemove = (blog) => {
+    if (window.confirm(`Remove blog ${blog.title} by ${blog.author}?`)) {
+      removeBlog(blog)
+    }
+  }
+
   const loginForm = () => {
     return (
       <Togglable buttonLabel="login">
@@ -129,7 +151,7 @@ const App = () => {
       <h3>create new blog</h3>
       {blogForm()}
       {blogs.sort((a, b) => b.likes - a.likes).map(blog => (
-        <Blog key={blog.id} blog={blog} onLike={addLike} />
+        <Blog key={blog.id} blog={blog} user={user} onLike={addLike} onRemove={handleRemove} />
       ))}
     </div>
   )
