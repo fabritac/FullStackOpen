@@ -16,7 +16,7 @@ const App = () => {
   useEffect(() => {
     blogService.getAll().then(blogs =>
       setBlogs( blogs )
-    )  
+    )
   }, [])
 
   useEffect(() => {
@@ -43,7 +43,7 @@ const App = () => {
             setSuccessMessage(null)
           }, 5000)
         })
-    } catch (exception) {
+    } catch {
       setErrorMessage('wrong username or password')
       setTimeout(() => {
         setErrorMessage(null)
@@ -117,9 +117,9 @@ const App = () => {
   const loginForm = () => {
     return (
       <Togglable buttonLabel="login">
-          <LoginForm
-            loginUser={loginUser}
-          />
+        <LoginForm
+          loginUser={loginUser}
+        />
       </Togglable>
     )
   }
