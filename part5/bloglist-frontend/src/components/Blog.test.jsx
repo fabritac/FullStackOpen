@@ -36,4 +36,17 @@ describe('Blog component', () => {
     expect(likes).toBeVisible()
   })
 
+  it('calls the onLike function twice when the like button is clicked twice', async () => {
+    const mockOnLike = vi.fn()
+    const { getByText } = render(<Blog blog={blog} onLike={mockOnLike} />)
+    const viewButton = getByText('view')
+    await viewButton.click()
+
+    const likeButton = getByText('like')
+    await likeButton.click()
+    await likeButton.click()
+
+    expect(mockOnLike).toHaveBeenCalledTimes(2)
+  })
+
 })
