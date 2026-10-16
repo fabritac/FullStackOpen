@@ -23,4 +23,17 @@ describe('Blog component', () => {
     expect(url).not.toBeVisible()
     expect(likes).not.toBeVisible()
   })
+
+  it('shows URL and likes when the view button is clicked', async () => {
+    const { container, getByText } = render(<Blog blog={blog} />)
+    const viewButton = getByText('view')
+    await viewButton.click()
+
+    const url = container.querySelector('.blog-url')
+    const likes = container.querySelector('.blog-likes')
+
+    expect(url).toBeVisible()
+    expect(likes).toBeVisible()
+  })
+
 })
