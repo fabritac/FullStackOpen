@@ -73,6 +73,22 @@ describe('Blog app', () => {
 
         await expect(blog.locator('.blog-likes')).toContainText('likes 1')
       })
+
+      test('a blog can be removed', async({ page }) => {
+        const blog = page.locator('.blog').filter({ hasText: 'a blog created by playwright' })
+
+        page.on('dialog', async dialog => {
+          expect(dialog.type()).toBe('confirm');
+          expect(dialog.message()).toContain('Remove blog a blog created by playwright by cguti?');
+          await dialog.accept(); // This clicks "OK"
+        });
+
+        await expect(blog).toBeVisible()
+        await page.getByRole('button', { name: 'view'}).click()
+        await page.getByRole('button', { name: 'remove'}).click()
+
+        await expect(blog).not.toBeVisible()
+      })
     })
 
   })
