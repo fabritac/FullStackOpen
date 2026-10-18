@@ -11,6 +11,13 @@ describe('Blog app', () => {
         password: '123guti'
       }
     })
+    await request.post('http://localhost:5173/api/users', {
+      data: {
+        name: 'John Doe',
+        username: 'jdoe',
+        password: '123doe'
+      }
+    })
 
     await page.goto('http://localhost:5173');
   });
@@ -88,6 +95,19 @@ describe('Blog app', () => {
         await page.getByRole('button', { name: 'remove'}).click()
 
         await expect(blog).not.toBeVisible()
+      })
+
+      test('other user cannot remove the blog', async({ page }) => {
+        await page.getByRole('button', { name: 'logout'}).click()
+        await page.getByRole('button', { name: 'login' }).click();
+        await page.getByLabel('username').fill('jdoe');
+        await page.getByLabel('password').fill('123doe');
+        await page.getByRole('button', { name: 'login' }).click();
+
+        const blog = page.locator('.blog').filter({ hasText: 'a blog created by playwright' })
+        await expect(blog).toBeVisible()
+        await page.getByRole('button', { name: 'view'}).click()
+        await expect(page.getByRole('button', { name: 'remove'})).not.toBeVisible()
       })
     })
 
