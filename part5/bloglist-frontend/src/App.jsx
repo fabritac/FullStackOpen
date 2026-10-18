@@ -30,19 +30,16 @@ const App = () => {
 
   const loginUser = async (userObject) => {
     try {
-      loginService
-        .login(userObject)
-        .then(user => {
-          window.localStorage.setItem(
-            'loggedBlogappUser', JSON.stringify(user)
-          )
-          blogService.setToken(user.token)
-          setUser(user)
-          setSuccessMessage('login successful')
-          setTimeout(() => {
-            setSuccessMessage(null)
-          }, 5000)
-        })
+      const user = await loginService.login(userObject)
+      window.localStorage.setItem(
+        'loggedBlogappUser', JSON.stringify(user)
+      )
+      blogService.setToken(user.token)
+      setUser(user)
+      setSuccessMessage('login successful')
+      setTimeout(() => {
+        setSuccessMessage(null)
+      }, 5000)
     } catch {
       setErrorMessage('wrong username or password')
       setTimeout(() => {
