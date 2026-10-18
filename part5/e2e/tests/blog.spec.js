@@ -54,6 +54,27 @@ describe('Blog app', () => {
       await page.getByRole('button', { name: 'create'}).click()
       await expect(page.getByText('a new blog a blog created by playwright by cguti added')).toBeVisible()
     })
+
+    describe('and a blog exists', () => {
+      beforeEach(async ({ page }) => {
+        await page.getByRole('button', { name: 'create new blog' }).click()
+        await page.getByLabel('title').fill('a blog created by playwright');
+        await page.getByLabel('author').fill('cguti');
+        await page.getByLabel('url').fill('Cguti.com');
+        await page.getByRole('button', { name: 'create' }).click()
+      })
+
+      test('a blog can be liked', async({ page }) => {
+        const blog = page.locator('.blog').filter({ hasText: 'a blog created by playwright' })
+
+        await expect(blog).toBeVisible()
+        await page.getByRole('button', { name: 'view'}).click()
+        await page.getByRole('button', { name: 'like'}).click()
+
+        await expect(blog.locator('.blog-likes')).toContainText('likes 1')
+      })
+    })
+
   })
 
 });
