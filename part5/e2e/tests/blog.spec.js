@@ -81,6 +81,40 @@ describe('Blog app', () => {
         await expect(blog.locator('.blog-likes')).toContainText('likes 1')
       })
 
+      test('blogs are ordered by likes, with the most-liked blog first', async ({ page }) => {
+        const createBlog = async (title) => {
+          await page.getByLabel('title').fill(title)
+          await page.getByLabel('author').fill('cguti')
+          await page.getByLabel('url').fill(`${title}.com`)
+          await page.getByRole('button', { name: 'create' }).click()
+          await expect(page.locator('.blog').filter({ hasText: title })).toBeVisible()
+        }
+
+        const likeBlog = async (title, likes) => {
+          const blog = page.locator('.blog').filter({ hasText: title })
+          await blog.getByRole('button', { name: 'view' }).click()
+          for (let i = 0; i < likes; i++) {
+            await blog.getByRole('button', { name: 'like' }).click()
+            await expect(blog.locator('.blog-likes')).toContainText(`likes ${i + 1}`)
+          }
+        }
+
+        const baseTitle = 'a blog created by playwright'
+        const mediumTitle = 'blog with one like'
+        const topTitle = 'blog with two likes'
+
+        await createBlog(mediumTitle)
+        await createBlog(topTitle)
+        await likeBlog(mediumTitle, 1)
+        await likeBlog(topTitle, 2)
+
+        const titles = await page.locator('.blog').evaluateAll(blogs =>
+          blogs.map(blog => blog.querySelector('.blog-title').textContent)
+        )
+
+        expect(titles).toEqual([topTitle, mediumTitle, baseTitle])
+      })
+
       test('a blog can be removed', async({ page }) => {
         const blog = page.locator('.blog').filter({ hasText: 'a blog created by playwright' })
 
