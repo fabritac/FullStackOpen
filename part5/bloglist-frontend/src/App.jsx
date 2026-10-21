@@ -5,12 +5,30 @@ import loginService from './services/login'
 
 import {
   BrowserRouter as Router,
-  Routes, Route, Link, Navigate,
+  Routes, Route, Link, Navigate, useParams,
 } from 'react-router-dom'
 import { NotificationError, NotificationSuccess } from './components/Notification'
 import BlogForm from './components/BlogForm'
 import LoginForm from './components/LoginForm'
 import Togglable from './components/Togglable'
+
+const BlogDetails = ({ blogs, user, onLike, onRemove }) => {
+  const { id } = useParams()
+  const blog = blogs.find(blog => String(blog.id) === id)
+
+  if (!blog) {
+    return <p>blog not found</p>
+  }
+
+  return (
+    <Blog
+      blog={blog}
+      user={user}
+      onLike={onLike}
+      onRemove={onRemove}
+    />
+  )
+}
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
@@ -75,6 +93,10 @@ const App = () => {
   }
 
   const addLike = async (blogObject) => {
+    if (!user) {
+      return
+    }
+
     try {
       const updatedBlog = {
         ...blogObject,
@@ -142,18 +164,19 @@ const App = () => {
     <Router>
       {user ? (
         <div>
-          <Link style={padding} to="/">blogs</Link>
+          <Link style={padding} to="/blogs">blogs</Link>
           <button onClick={handleLogout}>logout</button>
         </div>
       ) : (
         <div>
-          <Link style={padding} to="/">blogs</Link>
+          <Link style={padding} to="/blogs">blogs</Link>
           <Link style={padding} to="/login">login</Link>
         </div>
       )}
 
       <Routes>
-        <Route path="/" element={
+        <Route path="/" element={<Navigate to="/blogs" replace />} />
+        <Route path="/blogs" element={
           <div>
             <h2>blogs</h2>
             <NotificationError message={errorMessage} />
@@ -161,22 +184,36 @@ const App = () => {
             {user ? (
               <div>
                 {blogForm()}
-                {blogs.sort((a, b) => b.likes - a.likes).map(blog => (
-                  <Blog key={blog.id} blog={blog} user={user} onLike={addLike} onRemove={handleRemove} />
-                ))}
+                <ul>
+                  {blogs.sort((a, b) => b.likes - a.likes).map(blog => (
+                    <li key={blog.id}>
+                      <Link to={`/blogs/${blog.id}`}>{blog.title} {blog.author}</Link>
+                    </li>
+                  ))}
+                </ul>
               </div>
             ) : (
               <div>
-                {
-                  blogs.sort((a, b) => b.likes - a.likes).map(blog => (
-                    <Blog key={blog.id} blog={blog} user={user} onLike={addLike} onRemove={handleRemove} />
-                  ))
-                }
+                <ul>
+                  {blogs.sort((a, b) => b.likes - a.likes).map(blog => (
+                    <li key={blog.id}>
+                      <Link to={`/blogs/${blog.id}`}>{blog.title} {blog.author}</Link>
+                    </li>
+                  ))}
+                </ul>
               </div>
             )}
           </div>
         }/>
-        <Route path="login" element={user ? <Navigate to="/" replace /> : (
+        <Route path="/blogs/:id" element={
+          <BlogDetails
+            blogs={blogs}
+            user={user}
+            onLike={addLike}
+            onRemove={handleRemove}
+          />
+        } />
+        <Route path="/login" element={user ? <Navigate to="/blogs" replace /> : (
           <div>
             <h2>Login</h2>
             <NotificationError message={errorMessage} />
