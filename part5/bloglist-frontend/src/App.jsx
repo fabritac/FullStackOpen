@@ -2,6 +2,11 @@ import { useEffect, useState } from 'react'
 import Blog from './components/Blog'
 import blogService from './services/blogs'
 import loginService from './services/login'
+
+import {
+  BrowserRouter as Router,
+  Routes, Route, Link, Navigate,
+} from 'react-router-dom'
 import { NotificationError, NotificationSuccess } from './components/Notification'
 import BlogForm from './components/BlogForm'
 import LoginForm from './components/LoginForm'
@@ -129,28 +134,57 @@ const App = () => {
     )
   }
 
-  if (user === null) {
-    return (
-      <div>
-        <h2>Login</h2>
-        <NotificationError message={errorMessage} />
-        {loginForm()}
-      </div>
-    )
+  const padding = {
+    padding: 5
   }
 
   return (
-    <div>
-      <h2>blogs</h2>
-      <NotificationError message={errorMessage} />
-      <NotificationSuccess message={successMessage} />
-      <h3>{user.name} logged in <button onClick={handleLogout}>logout</button></h3>
-      <h3>create new blog</h3>
-      {blogForm()}
-      {blogs.sort((a, b) => b.likes - a.likes).map(blog => (
-        <Blog key={blog.id} blog={blog} user={user} onLike={addLike} onRemove={handleRemove} />
-      ))}
-    </div>
+    <Router>
+      {user ? (
+        <div>
+          <Link style={padding} to="/">blogs</Link>
+          <button onClick={handleLogout}>logout</button>
+        </div>
+      ) : (
+        <div>
+          <Link style={padding} to="/">blogs</Link>
+          <Link style={padding} to="/login">login</Link>
+        </div>
+      )}
+
+      <Routes>
+        <Route path="/" element={
+          <div>
+            <h2>blogs</h2>
+            <NotificationError message={errorMessage} />
+            <NotificationSuccess message={successMessage} />
+            {user ? (
+              <div>
+                {blogForm()}
+                {blogs.sort((a, b) => b.likes - a.likes).map(blog => (
+                  <Blog key={blog.id} blog={blog} user={user} onLike={addLike} onRemove={handleRemove} />
+                ))}
+              </div>
+            ) : (
+              <div>
+                {
+                  blogs.sort((a, b) => b.likes - a.likes).map(blog => (
+                    <Blog key={blog.id} blog={blog} user={user} onLike={addLike} onRemove={handleRemove} />
+                  ))
+                }
+              </div>
+            )}
+          </div>
+        }/>
+        <Route path="login" element={user ? <Navigate to="/" replace /> : (
+          <div>
+            <h2>Login</h2>
+            <NotificationError message={errorMessage} />
+            {loginForm()}
+          </div>
+        )} />
+      </Routes>
+    </Router>
   )
 }
 
