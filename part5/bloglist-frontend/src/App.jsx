@@ -4,8 +4,8 @@ import blogService from './services/blogs'
 import loginService from './services/login'
 
 import {
-  BrowserRouter as Router,
   Routes, Route, Link, Navigate, useParams,
+  useNavigate,
 } from 'react-router-dom'
 import { NotificationError, NotificationSuccess } from './components/Notification'
 import BlogForm from './components/BlogForm'
@@ -35,6 +35,7 @@ const App = () => {
   const [user, setUser] = useState(null)
   const [errorMessage, setErrorMessage] = useState(null)
   const [successMessage, setSuccessMessage] = useState(null)
+  const navigate = useNavigate()
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
@@ -74,12 +75,14 @@ const App = () => {
   const handleLogout = () => {
     window.localStorage.removeItem('loggedBlogappUser')
     setUser(null)
+    navigate('/blogs')
   }
 
   const addBlog = async (blogObject) => {
     try {
       const returnedBlog = await blogService.create(blogObject)
       setBlogs(previousBlogs => previousBlogs.concat(returnedBlog))
+      navigate('/blogs')
       setSuccessMessage(`a new blog ${blogObject.title} by ${blogObject.author} added`)
       setTimeout(() => {
         setSuccessMessage(null)
@@ -150,9 +153,10 @@ const App = () => {
 
   const blogForm = () => {
     return (
-      <Togglable buttonLabel="create new blog">
+      <div>
+        <h3>Create new</h3>
         <BlogForm createBlog={addBlog} />
-      </Togglable>
+      </div>
     )
   }
 
@@ -161,10 +165,11 @@ const App = () => {
   }
 
   return (
-    <Router>
+    <>
       {user ? (
         <div>
           <Link style={padding} to="/blogs">blogs</Link>
+          <Link style={padding} to="/create">new blog</Link>
           <button onClick={handleLogout}>logout</button>
         </div>
       ) : (
@@ -176,6 +181,7 @@ const App = () => {
 
       <Routes>
         <Route path="/" element={<Navigate to="/blogs" replace />} />
+        <Route path='/create' element={blogForm()}/>
         <Route path="/blogs" element={
           <div>
             <h2>blogs</h2>
@@ -183,7 +189,6 @@ const App = () => {
             <NotificationSuccess message={successMessage} />
             {user ? (
               <div>
-                {blogForm()}
                 <ul>
                   {blogs.sort((a, b) => b.likes - a.likes).map(blog => (
                     <li key={blog.id}>
@@ -221,7 +226,7 @@ const App = () => {
           </div>
         )} />
       </Routes>
-    </Router>
+    </>
   )
 }
 
