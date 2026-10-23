@@ -1,25 +1,15 @@
-const NotificationError = ({ message }) => {
-  if (message === null) {
+import { Alert } from "@mui/material";
+
+const Notification = ({ notification }) => {
+  if (notification === null) {
     return null
   }
 
   return (
-    <div className="error">
-      {message}
-    </div>
+    <Alert style={{ marginTop: 10, marginBottom: 10}} severity={notification.type}>
+      {notification.text}
+    </Alert>
   )
 }
 
-const NotificationSuccess = ({ message }) => {
-  if (message === null) {
-    return null
-  }
-
-  return (
-    <div className="success">
-      {message}
-    </div>
-  )
-}
-
-export { NotificationError, NotificationSuccess }
+export default Notification
