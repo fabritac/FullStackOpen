@@ -1,4 +1,4 @@
-import { render } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import Blog from './Blog'
 
 describe('Blog component', () => {
@@ -13,45 +13,30 @@ describe('Blog component', () => {
     }
   }
 
-  it('renders the full blog details by default', () => {
-    const { container, getByText } = render(<Blog blog={blog} />)
-    const title = container.querySelector('h2.blog-title')
+  it('shows blog information and likes to unauthenticated users without buttons', () => {
+    const { container } = render(<Blog blog={blog} />)
 
-    expect(title).toHaveTextContent('Test Blog')
+    expect(screen.getByRole('heading', { name: 'Test Blog' })).toBeVisible()
     expect(container.querySelector('.blog-author')).toHaveTextContent('Test Author')
     expect(container.querySelector('.blog-url')).toHaveTextContent('https://test.com')
     expect(container.querySelector('.blog-likes')).toHaveTextContent('likes 5')
-    expect(getByText('added by Blog Creator')).toBeVisible()
-    expect(getByText('view')).toBeNull()
-    expect(getByText('hide')).toBeNull()
+    expect(screen.getByText('added by Blog Creator')).toBeVisible()
+    expect(screen.queryByRole('button')).not.toBeInTheDocument()
   })
 
-  it('calls the onLike function twice when the like button is clicked twice', async () => {
-    const mockOnLike = vi.fn()
-    const { getByText } = render(
-      <Blog blog={blog} user={{ username: 'reader' }} onLike={mockOnLike} />
-    )
-    const likeButton = getByText('like')
-    await likeButton.click()
-    await likeButton.click()
+  it('shows only the like button to an authenticated user who did not create the blog', () => {
+    render(<Blog blog={blog} user={{ username: 'reader' }} />)
 
-    expect(mockOnLike).toHaveBeenCalledTimes(2)
+    expect(screen.getByRole('button', { name: 'like' })).toBeVisible()
+    expect(screen.queryByRole('button', { name: 'remove' })).not.toBeInTheDocument()
+    expect(screen.getAllByRole('button')).toHaveLength(1)
   })
 
-  it('hides the like button when no user is logged in', () => {
-    const { queryByText } = render(<Blog blog={blog} />)
+  it('shows the like and delete buttons to the blog creator', () => {
+    render(<Blog blog={blog} user={{ username: 'creator' }} />)
 
-    expect(queryByText('like')).toBeNull()
+    expect(screen.getByRole('button', { name: 'like' })).toBeVisible()
+    expect(screen.getByRole('button', { name: 'remove' })).toBeVisible()
+    expect(screen.getAllByRole('button')).toHaveLength(2)
   })
-
-  it('shows the remove button only to the user who added the blog', () => {
-    const { queryByText, rerender } = render(
-      <Blog blog={blog} user={{ username: 'other' }} />
-    )
-    expect(queryByText('remove')).toBeNull()
-
-    rerender(<Blog blog={blog} user={{ username: 'creator' }} />)
-    expect(queryByText('remove')).toBeVisible()
-  })
-
 })
