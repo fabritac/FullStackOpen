@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import Blog from './components/Blog'
 import blogService from './services/blogs'
 import loginService from './services/login'
+import { Container } from '@mui/material'
 
 import {
   Routes, Route, Link, Navigate, useParams,
@@ -141,31 +142,12 @@ const App = () => {
     }
   }
 
-  const loginForm = () => {
-    return (
-      <Togglable buttonLabel="login">
-        <LoginForm
-          loginUser={loginUser}
-        />
-      </Togglable>
-    )
-  }
-
-  const blogForm = () => {
-    return (
-      <div>
-        <h3>Create new</h3>
-        <BlogForm createBlog={addBlog} />
-      </div>
-    )
-  }
-
   const padding = {
     padding: 5
   }
 
   return (
-    <>
+    <Container>
       {user ? (
         <div>
           <Link style={padding} to="/blogs">blogs</Link>
@@ -181,7 +163,9 @@ const App = () => {
 
       <Routes>
         <Route path="/" element={<Navigate to="/blogs" replace />} />
-        <Route path='/create' element={blogForm()}/>
+        <Route path='/create' element={
+           <BlogForm createBlog={addBlog} />
+          }/>
         <Route path="/blogs" element={
           <div>
             <h2>blogs</h2>
@@ -220,13 +204,12 @@ const App = () => {
         } />
         <Route path="/login" element={user ? <Navigate to="/blogs" replace /> : (
           <div>
-            <h2>Login</h2>
             <NotificationError message={errorMessage} />
-            {loginForm()}
+            <LoginForm loginUser={loginUser} />
           </div>
         )} />
       </Routes>
-    </>
+    </Container>
   )
 }
 
