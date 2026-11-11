@@ -35,6 +35,21 @@ const useStore = create((set) => ({
           votes
         }
       }
+    }),
+    addAnecdote: (anecdote) => set((state) => {
+      const newAnecdote = {
+        content: anecdote,
+        id: Math.floor(Math.random() * 1000000),
+        votes: 0
+      }
+      anecdotes.push(newAnecdote.content)
+
+      return {
+        counters: {
+          ...state.counters,
+          votes: [...state.counters.votes, 0]
+        }
+      }
     })
   }
 }))
