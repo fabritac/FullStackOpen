@@ -3,7 +3,6 @@ import { anecdotes } from './data/anecdotes'
 
 const initialState = {
   counters: {
-    selected: 0,
     votes: Array(anecdotes.length).fill(0)
   }
 }
@@ -11,23 +10,9 @@ const initialState = {
 const useStore = create((set) => ({
   ...initialState,
   actions: {
-    handleSelected: () => set((state) => {
-      let selected = state.counters.selected
-
-      while (selected === state.counters.selected) {
-        selected = Math.floor(Math.random() * anecdotes.length)
-      }
-
-      return {
-        counters: {
-          ...state.counters,
-          selected
-        }
-      }
-    }),
-    handleVotes: () => set((state) => {
+    handleVotes: (anecdoteIndex) => set((state) => {
       const votes = [...state.counters.votes]
-      votes[state.counters.selected] += 1
+      votes[anecdoteIndex] += 1
 
       return {
         counters: {

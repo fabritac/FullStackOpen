@@ -2,21 +2,27 @@ import { useStoreState, useStoreActions } from '../store'
 import { anecdotes } from '../data/anecdotes'
 
 const AnecdoteList = () => {
-  const { selected, votes } = useStoreState()
-  const { handleSelected, handleVotes } = useStoreActions()
-  const maxVotes = Math.max(...votes)
-  const maxIndex = votes.indexOf(maxVotes)
+  const { votes } = useStoreState()
+  const { handleVotes } = useStoreActions()
+
+  const anecdotesSorted = anecdotes.toSorted((a, b) => votes[anecdotes.indexOf(b)] - votes[anecdotes.indexOf(a)])
 
   return (
     <div>
-      <h1>Anecdote of the day</h1>
-      <div>{anecdotes[selected]}</div>
-      <div>has {votes[selected]} votes</div>
-      <button onClick={handleSelected}>next anecdote</button>
-      <button onClick={handleVotes}>Vote</button>
-      <h1>anecdote with most votes</h1>
-      <div>{anecdotes[maxIndex]}</div>
-      <div>has {votes[maxIndex]} votes</div>
+      <h1>All Anecdotes</h1>
+      <ul>
+        {anecdotesSorted.map((anecdote, index) => {
+          const anecdoteIndex = anecdotes.indexOf(anecdote)
+
+          return (
+            <li key={index}>
+              {anecdote} - has {votes[anecdoteIndex]} votes
+              <button onClick={() => handleVotes(anecdoteIndex)}>Vote</button>
+            </li>
+          )
+        })}
+      </ul>
+
     </div>
   )
 }
