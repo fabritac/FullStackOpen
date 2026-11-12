@@ -12,9 +12,9 @@ const AnecdoteList = () => {
       <ul>
         {anecdotesSorted.map((anecdote) => {
           return (
-            <li key={anecdote.index}>
+            <li key={anecdote.id}>
               {anecdote.content} - has {anecdote.votes} votes
-              <button onClick={() => handleVotes(anecdote.index)}>Vote</button>
+              <button onClick={() => handleVotes(anecdote.id)}>Vote</button>
             </li>
           )
         })}

@@ -1,61 +1,53 @@
 import { create } from 'zustand'
-import { anecdotes } from './data/anecdotes'
+import anecdotesService from './services/anecdotes'
 
 const initialState = {
-  counters: {
-    votes: Array(anecdotes.length).fill(0)
-  },
+  anecdotes: [],
+  filter: ''
 }
 
 const useStore = create((set) => ({
   ...initialState,
-  filter: '',
   actions: {
-    handleVotes: (anecdoteIndex) => set((state) => {
-      const votes = [...state.counters.votes]
-      votes[anecdoteIndex] += 1
+    handleVotes: async (anecdoteId) => {
+      const anecdote = useStore.getState().anecdotes.find(({ id }) => id === anecdoteId)
+      if (!anecdote) return
 
-      return {
-        counters: {
-          ...state.counters,
-          votes
-        }
-      }
-    }),
-    addAnecdote: (anecdote) => set((state) => {
-      const newAnecdote = {
-        content: anecdote,
-        id: Math.floor(Math.random() * 1000000),
-        votes: 0
-      }
-      anecdotes.push(newAnecdote.content)
+      const updatedAnecdote = await anecdotesService.update({
+        ...anecdote,
+        votes: anecdote.votes + 1
+      })
 
-      return {
-        counters: {
-          ...state.counters,
-          votes: [...state.counters.votes, 0]
-        }
-      }
-    }),
-    setFilter: (filter) => set({ filter })
+      set((state) => ({
+        anecdotes: state.anecdotes.map((current) =>
+          current.id === updatedAnecdote.id ? updatedAnecdote : current
+        )
+      }))
+    },
+    addAnecdote: async (content) => {
+      const newAnecdote = await anecdotesService.create(content)
+
+      set((state) => ({
+        anecdotes: [...state.anecdotes, newAnecdote]
+      }))
+    },
+    setFilter: (filter) => set({ filter }),
+    initializeAnecdotes: (anecdotes) => set({ anecdotes })
   }
 }))
 
 export const useAnecdotes = () => {
-  const { votes } = useStoreState()
+  const anecdotes = useStoreState()
   const filter = useFilter()
-  const anecdotesWithVotes = anecdotes.map((content, index) => ({
-    content,
-    index,
-    votes: votes[index]
-  }))
 
   return {
-    anecdotes: anecdotesWithVotes.filter(anecdote => anecdote.content.toLowerCase().includes(filter.toLowerCase())),
+    anecdotes: anecdotes.filter(anecdote =>
+      anecdote.content.toLowerCase().includes(filter.toLowerCase())
+    ),
     filter
   }
 }
 
-export const useStoreState = () => useStore(state => state.counters)
+export const useStoreState = () => useStore(state => state.anecdotes)
 export const useStoreActions = () => useStore(state => state.actions)
 export const useFilter = () => useStore(state => state.filter)

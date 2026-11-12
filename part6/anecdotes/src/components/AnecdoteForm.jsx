@@ -8,8 +8,7 @@ const AnecdoteForm = () => {
     const form = event.currentTarget
     const anecdote = form.anecdote.value.trim()
     if (anecdote) {
-      addAnecdoteToStore(anecdote)
-      form.reset()
+      addAnecdoteToStore(anecdote).then(() => form.reset())
     }
   }
 
