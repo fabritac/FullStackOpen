@@ -4,11 +4,12 @@ import { anecdotes } from './data/anecdotes'
 const initialState = {
   counters: {
     votes: Array(anecdotes.length).fill(0)
-  }
+  },
 }
 
 const useStore = create((set) => ({
   ...initialState,
+  filter: '',
   actions: {
     handleVotes: (anecdoteIndex) => set((state) => {
       const votes = [...state.counters.votes]
@@ -35,9 +36,26 @@ const useStore = create((set) => ({
           votes: [...state.counters.votes, 0]
         }
       }
-    })
+    }),
+    setFilter: (filter) => set({ filter })
   }
 }))
 
+export const useAnecdotes = () => {
+  const { votes } = useStoreState()
+  const filter = useFilter()
+  const anecdotesWithVotes = anecdotes.map((content, index) => ({
+    content,
+    index,
+    votes: votes[index]
+  }))
+
+  return {
+    anecdotes: anecdotesWithVotes.filter(anecdote => anecdote.content.toLowerCase().includes(filter.toLowerCase())),
+    filter
+  }
+}
+
 export const useStoreState = () => useStore(state => state.counters)
 export const useStoreActions = () => useStore(state => state.actions)
+export const useFilter = () => useStore(state => state.filter)
