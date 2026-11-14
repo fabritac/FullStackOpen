@@ -78,5 +78,3 @@ describe('useStoreActions', () => {
         expect(useStore.getState().filter).toBe('test filter')
     })
 })
-
-
