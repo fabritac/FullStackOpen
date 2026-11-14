@@ -70,6 +70,13 @@ describe('useStoreActions', () => {
         expect(sortedAnecdotes[1].votes).toBe(2)
         expect(sortedAnecdotes[2].votes).toBe(1)
     })
+
+    it('setFilter updates the filter state', () => {
+        const { result } = renderHook(() => useStoreActions())
+        result.current.setFilter('test filter')
+
+        expect(useStore.getState().filter).toBe('test filter')
+    })
 })
 
 

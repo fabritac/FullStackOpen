@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1794688660698" clover="3.2.0">
-  <project timestamp="1794688660698" name="All files">
-    <metrics statements="36" coveredstatements="23" conditionals="6" coveredconditionals="4" methods="24" coveredmethods="11" elements="66" coveredelements="38" complexity="0" loc="36" ncloc="36" packages="1" files="1" classes="1"/>
+<coverage generated="1794688744990" clover="3.2.0">
+  <project timestamp="1794688744991" name="All files">
+    <metrics statements="36" coveredstatements="24" conditionals="6" coveredconditionals="4" methods="24" coveredmethods="12" elements="66" coveredelements="40" complexity="0" loc="36" ncloc="36" packages="1" files="1" classes="1"/>
     <file name="store.js" path="/home/fabri/Programming/FullStackOpen/part6/anecdotes/src/store.js">
-      <metrics statements="36" coveredstatements="23" conditionals="6" coveredconditionals="4" methods="24" coveredmethods="11"/>
+      <metrics statements="36" coveredstatements="24" conditionals="6" coveredconditionals="4" methods="24" coveredmethods="12"/>
       <line num="4" count="1" type="stmt"/>
       <line num="12" count="1" type="stmt"/>
       <line num="16" count="1" type="stmt"/>
@@ -25,7 +25,7 @@
       <line num="52" count="0" type="stmt"/>
       <line num="54" count="0" type="stmt"/>
       <line num="56" count="0" type="stmt"/>
-      <line num="59" count="0" type="stmt"/>
+      <line num="59" count="1" type="stmt"/>
       <line num="61" count="1" type="cond" truecount="2" falsecount="0"/>
       <line num="62" count="1" type="stmt"/>
       <line num="65" count="2" type="stmt"/>
@@ -37,7 +37,7 @@
       <line num="76" count="0" type="stmt"/>
       <line num="78" count="0" type="stmt"/>
       <line num="84" count="1" type="stmt"/>
-      <line num="85" count="31" type="stmt"/>
+      <line num="85" count="41" type="stmt"/>
       <line num="86" count="1" type="stmt"/>
       <line num="87" count="1" type="stmt"/>
     </file>
