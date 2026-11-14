@@ -44,6 +44,18 @@ const useStore = create((set) => ({
         useStore.getState().actions.showNotification(error.message, 'error')
       }
     },
+    removeAnecdote: async (anecdoteId) => {
+      try {
+        await anecdotesService.remove(anecdoteId)
+
+        set((state) => ({
+          anecdotes: state.anecdotes.filter(({ id }) => id !== anecdoteId)
+        }))
+        useStore.getState().actions.showNotification('Anecdote has been removed', 'success')
+      } catch (error) {
+        useStore.getState().actions.showNotification(error.message, 'error')
+      }
+    },
     setFilter: (filter) => set({ filter }),
     initializeAnecdotes: (anecdotes) => set({ anecdotes }),
     showNotification: (message, type) => {

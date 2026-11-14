@@ -34,16 +34,6 @@
       "content": "New note for testing!",
       "votes": 8,
       "id": "rVbTkoNbQ84"
-    },
-    {
-      "content": "Testing!",
-      "votes": 1,
-      "id": "tuUfXjWg-eI"
-    },
-    {
-      "content": "Probando notificaciones?",
-      "votes": 0,
-      "id": "x7ap5clZgr8"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"
