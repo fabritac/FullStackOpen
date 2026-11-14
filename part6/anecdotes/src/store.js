@@ -9,7 +9,7 @@ const initialState = {
 
 let notificationTimeout
 
-const useStore = create((set) => ({
+export const useStore = create((set) => ({
   ...initialState,
   actions: {
     handleVotes: async (anecdoteId) => {
@@ -57,7 +57,10 @@ const useStore = create((set) => ({
       }
     },
     setFilter: (filter) => set({ filter }),
-    initializeAnecdotes: (anecdotes) => set({ anecdotes }),
+    initializeAnecdotes: async (anecdotes) => {
+      const initialAnecdotes = anecdotes ?? await anecdotesService.getAll()
+      set({ anecdotes: initialAnecdotes })
+    },
     showNotification: (message, type) => {
       clearTimeout(notificationTimeout)
       set({ notification: { message, type } })

@@ -8,7 +8,9 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "server": "json-server -p 3001 src/anecdotes.json"
+    "server": "json-server -p 3001 src/anecdotes.json",
+    "test": "vitest run --coverage",
+    "test:watch": "vitest --watch"
   },
   "dependencies": {
     "react": "^19.2.0",
@@ -17,14 +19,18 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
+    "@testing-library/react": "^16.3.3",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.1",
+    "@vitest/coverage-v8": "^5.1.0",
     "eslint": "^9.39.1",
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.4.24",
     "globals": "^16.5.0",
+    "jsdom": "^31.0.1",
+    "json-server": "^1.0.0-beta.15",
     "vite": "^7.3.1",
-    "json-server": "^1.0.0-beta.15"
+    "vitest": "^5.1.0"
   }
 }
